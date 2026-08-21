@@ -1,148 +1,79 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0e13" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="TreasureRadar" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d1a13">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TreasureRadar">
+  <meta name="description" content="רדאר למציאות, אוסף ופליפים בישראל">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
   <title>TreasureRadar IL</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root{color-scheme:dark;font-family:Inter,Arial,sans-serif;background:#07110d;color:#f5f3e8}
+    *{box-sizing:border-box}body{margin:0;min-height:100svh;background:radial-gradient(circle at 50% 18%,#173d2b 0,#0a1a12 34%,#050b08 72%);display:grid;place-items:center;padding:24px}
+    .boot{width:min(440px,100%);text-align:center}.mark{width:88px;height:88px;margin:auto;border:1px solid #d9b85c55;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 0 40px #d9b85c22,inset 0 0 28px #0d2318}
+    .mark:before,.mark:after{content:"";position:absolute;border:1px solid #d9b85c44;border-radius:50%;inset:10px}.mark:after{inset:25px;background:#d9b85c;box-shadow:0 0 20px #d9b85c88}
+    h1{margin:22px 0 6px;font-size:28px;letter-spacing:-.5px}p{margin:0;color:#aab8af;line-height:1.6}.bar{height:4px;border-radius:999px;background:#ffffff12;margin:26px auto 0;overflow:hidden;width:min(260px,80%)}.bar i{display:block;height:100%;width:42%;border-radius:inherit;background:linear-gradient(90deg,#9b7a2d,#f3d985);animation:load 1.1s ease-in-out infinite alternate}.status{font-size:13px;margin-top:12px;color:#c7b36f}
+    .error{display:none;margin-top:20px;padding:16px;border:1px solid #ff737344;border-radius:16px;background:#3b151580;color:#ffd5d5;text-align:right}.error button{margin-top:12px;border:0;border-radius:12px;padding:11px 16px;background:#d9b85c;color:#12100a;font-weight:700;cursor:pointer}
+    @keyframes load{from{transform:translateX(135%)}to{transform:translateX(-235%)}}
+  </style>
 </head>
 <body>
-<div class="app">
-  <header class="topbar">
-    <div class="toprow">
-      <div class="brand">
-        <div class="brandmark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M4 18.5 9.2 5.7a1.5 1.5 0 0 1 2.78-.04l2.06 4.65 1.05-2.07a1.5 1.5 0 0 1 2.73.1L21 18.5" stroke="#f0c96a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 18.5h18M8.1 13.5l2.2 1.35 3.8-2.5 3.4 2.15" stroke="#f0c96a" stroke-width="1.7" stroke-linecap="round"/></svg>
-        </div>
-        <div><h1>TreasureRadar IL</h1><small>מציאות · אוסף · פליפים</small></div>
-      </div>
-      <button class="status" id="connectionBtn" aria-label="מצב חיבור"><span class="dot local" id="connectionDot"></span><span id="connectionText">מצב מקומי</span></button>
-    </div>
-  </header>
-
-  <main>
-    <section class="view active" data-view="radar">
-      <div class="hero">
-        <div class="eyebrow">RADAR ACTIVE</div>
-        <h2>לא מחפשים הנחה. מחפשים מישהו שלא יודע מה יש לו.</h2>
-        <p>מכניסים מודעה, מחיר ושווי משוער. המערכת מחשבת רווח, ROI, סיכון ונותנת החלטה ברורה: PASS, WATCH, BUY או JACKPOT.</p>
-        <div class="hero-actions"><button class="btn primary" data-go="analyze">נתח מציאה</button><button class="btn" id="refreshFeed">רענן רדאר</button></div>
-      </div>
-      <div class="stats">
-        <div class="stat"><span>מציאות ברדאר</span><b id="statDeals">0</b></div>
-        <div class="stat"><span>JACKPOT</span><b class="up" id="statJackpots">0</b></div>
-        <div class="stat"><span>שווי באוסף</span><b id="statVault">₪0</b></div>
-        <div class="stat"><span>רווח ממומש</span><b class="up" id="statProfit">₪0</b></div>
-      </div>
-      <div class="section-head"><div><h3>הזדמנויות</h3><p id="feedCaption">דוגמאות מקומיות עד חיבור לסורק</p></div><button class="linkbtn" id="sortDeals">מיון: ציון</button></div>
-      <div class="chips" id="categoryChips"></div>
-      <div class="deal-list" id="dealList"></div>
-    </section>
-
-    <section class="view" data-view="analyze">
-      <div class="section-head"><div><h3>מנתח מציאה</h3><p>Facebook Marketplace, יד2, eBay, חנות או שוק פשפשים</p></div><button class="linkbtn" id="openPaste">הדבק טקסט</button></div>
-      <form class="panel" id="analyzeForm">
-        <div class="field"><label>כותרת המודעה</label><input id="aTitle" required placeholder="למשל: ארגז Hot Wheels ישנים" /></div>
-        <div class="grid2">
-          <div class="field"><label>קטגוריה</label><select id="aCategory"></select></div>
-          <div class="field"><label>מקור</label><select id="aSource"></select></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>מחיר מבוקש ₪</label><input id="aPrice" type="number" min="0" step="1" required inputmode="decimal" placeholder="150" /></div>
-          <div class="field"><label>שווי שוק משוער ₪</label><input id="aMarket" type="number" min="0" step="1" required inputmode="decimal" placeholder="500" /></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>משלוח / נסיעה ₪</label><input id="aShipping" type="number" min="0" value="0" inputmode="decimal" /></div>
-          <div class="field"><label>תיקון / השלמות ₪</label><input id="aRepair" type="number" min="0" value="0" inputmode="decimal" /></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>עמלות מכירה %</label><input id="aFee" type="number" min="0" max="40" value="10" inputmode="decimal" /></div>
-          <div class="field"><label>מספר מכירות השוואה</label><input id="aComps" type="number" min="0" value="3" inputmode="numeric" /></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>ביקוש</label><select id="aDemand"><option value="1">1 · חלש</option><option value="2">2</option><option value="3" selected>3 · בינוני</option><option value="4">4</option><option value="5">5 · חזק</option></select></div>
-          <div class="field"><label>נדירות</label><select id="aRarity"><option value="1">1 · רגיל</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5 · נדיר</option></select></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>ביטחון במקוריות</label><select id="aAuth"><option value="40">40% · חשוד</option><option value="60">60%</option><option value="75" selected>75%</option><option value="90">90%</option><option value="100">100% · מאומת</option></select></div>
-          <div class="field"><label>עניין אישי לשמירה</label><select id="aInterest"><option value="1">1 · לא מעניין</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5 · חייב לאוסף</option></select></div>
-        </div>
-        <div class="field"><label>קישור למודעה</label><input id="aUrl" type="url" placeholder="https://..." /></div>
-        <div class="field"><label>הערות / מצב הפריט</label><textarea id="aNotes" placeholder="סגור, חסר חלק, איסוף מאשקלון, המוכר לא בטוח מה הדגם..."></textarea></div>
-        <button class="btn primary block" type="submit">חשב אם זו מציאה</button>
-        <div class="analysis-card" id="analysisResult"></div>
-      </form>
-      <div class="notice warn">הציון הוא כלי החלטה, לא הבטחה. לפני קנייה בודקים מקוריות, מצב, מכירות שהושלמו ועלויות אמיתיות.</div>
-    </section>
-
-    <section class="view" data-view="vault">
-      <div class="section-head"><div><h3>הכספת שלי</h3><p>דברים ששמרנו ודברים שמחכים למכירה</p></div><button class="linkbtn" id="exportData">גיבוי JSON</button></div>
-      <div class="inventory-grid" id="inventoryList"></div>
-    </section>
-
-    <section class="view" data-view="flips">
-      <div class="hero">
-        <div class="eyebrow">FLIP JOURNAL</div><h2 id="profitHero">₪0 רווח ממומש</h2><p>רק מכירות שבאמת נסגרו נחשבות. מחיר מודעה הוא לא שווי.</p>
-      </div>
-      <div class="stats">
-        <div class="stat"><span>השקעה כוללת</span><b id="flipInvested">₪0</b></div>
-        <div class="stat"><span>הכנסות</span><b id="flipRevenue">₪0</b></div>
-        <div class="stat"><span>עמלות</span><b id="flipFees">₪0</b></div>
-        <div class="stat"><span>ROI</span><b class="up" id="flipROI">0%</b></div>
-      </div>
-      <div class="deal-list" id="soldList"></div>
-    </section>
-
-    <section class="view" data-view="watch">
-      <div class="section-head"><div><h3>מקורות ומעקב</h3><p>הסורק החי מתחבר לשרת. האפליקציה בטלפון נשארת לוח הבקרה.</p></div><button class="linkbtn" id="settingsBtn">הגדרות</button></div>
-      <div id="sourceList"></div>
-      <div class="panel">
-        <h3>מילות חיפוש חכמות</h3><p>מילות מפתח למודעות שיכולות להסתיר פריט יקר.</p>
-        <div class="chips" id="keywordChips"></div>
-        <button class="btn block" id="addKeyword">הוסף מילת חיפוש</button>
-      </div>
-      <div class="panel">
-        <h3>Facebook Marketplace</h3><p>סריקה אוטומטית ישירה של Marketplace אינה יציבה בגלל התחברות והגנות. בגרסה הזו מדביקים קישור או טקסט מהמודעה ומקבלים ניתוח מיידי. השרת בנוי לקבל בהמשך גם קישורים מבוט Telegram.</p>
-        <button class="btn primary block" data-go="analyze">נתח מודעת Facebook</button>
-      </div>
-    </section>
+  <main class="boot" id="boot">
+    <div class="mark" aria-hidden="true"></div>
+    <h1>TreasureRadar IL</h1>
+    <p>טוען את הרדאר, הכספת ומנוע ניתוח העסקאות…</p>
+    <div class="bar"><i></i></div>
+    <div class="status" id="status">מוריד את קבצי האפליקציה</div>
+    <div class="error" id="error"><strong>האפליקציה לא נטענה</strong><div id="errorText"></div><button onclick="location.reload()">נסה שוב</button></div>
   </main>
-</div>
+<script>
+(async function bootTreasureRadar(){
+  const status=document.getElementById('status');
+  const fail=(message)=>{document.querySelector('.bar').style.display='none';status.style.display='none';const box=document.getElementById('error');document.getElementById('errorText').textContent=message;box.style.display='block'};
+  try{
+    if(!('DecompressionStream' in window)) throw new Error('הדפדפן ישן מדי. עדכן את Safari או Chrome ונסה שוב.');
+    const names=Array.from({length:8},(_,i)=>'./bundle.part'+String(i).padStart(2,'0'));
+    const parts=await Promise.all(names.map(async(name)=>{const response=await fetch(name,{cache:'no-store'});if(!response.ok)throw new Error('חסר קובץ אפליקציה: '+name);return response.text()}));
+    status.textContent='פותח את האפליקציה';
+    const encoded=parts.join('').replace(/\s/g,'');
+    const binary=atob(encoded);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const files=JSON.parse(await new Response(stream).text());
+    if(!files['index.html']||!files['app.js'])throw new Error('חבילת האפליקציה אינה תקינה.');
 
-<nav class="bottomnav" aria-label="ניווט">
-  <div class="navinner">
-    <button class="navbtn active" data-go="radar"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M12 12 17 7M12 4v2M12 18v2M4 12h2M18 12h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>רדאר</span></button>
-    <button class="navbtn" data-go="analyze"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.5"/></svg><span>מציאה</span></button>
-    <button class="navbtn" data-go="vault"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h16v12H4zM7 8V5h10v3M8 13h8" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>כספת</span></button>
-    <button class="navbtn" data-go="flips"><svg viewBox="0 0 24 24" fill="none"><path d="m4 15 5-5 4 4 7-8M16 6h4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>פליפים</span></button>
-    <button class="navbtn" data-go="watch"><svg viewBox="0 0 24 24" fill="none"><path d="M5 9a7 7 0 0 1 14 0c0 8 2 8 2 8H3s2 0 2-8ZM9.5 20h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>מעקב</span></button>
-  </div>
-</nav>
+    let html=String(files['index.html']);
+    const css=String(files['styles.css']||'');
+    let app=String(files['app.js']);
 
-<div class="toast" id="toast"></div>
+    app=app
+      .replace(/navigator\.serviceWorker\.register\((['"])\/sw\.js\1\)/g,'navigator.serviceWorker.register("./sw.js")')
+      .replace(/(["'])\/icon\.svg\1/g,'$1./icon.svg$1')
+      .replace(/(["'])\/manifest\.webmanifest\1/g,'$1./manifest.webmanifest$1');
 
-<div class="modal" id="settingsModal">
-  <div class="sheet"><div class="sheet-handle"></div><button class="closex" data-close="settingsModal">✕</button><h3>הגדרות חיבור</h3>
-    <div class="notice">גרסת הטלפון עובדת מיד במצב מקומי. כדי לקבל סריקה חיה 24/7, מעלים את תיקיית backend לשרת ומדביקים כאן את הכתובת.</div>
-    <div class="field"><label>כתובת Backend</label><input id="backendUrl" placeholder="https://your-radar.onrender.com" /></div>
-    <div class="grid2"><div class="field"><label>סף JACKPOT % מתחת לשוק</label><input id="thresholdJackpot" type="number" value="55" /></div><div class="field"><label>רווח מינימלי BUY ₪</label><input id="thresholdProfit" type="number" value="60" /></div></div>
-    <button class="btn primary block" id="saveSettings">שמור ובדוק חיבור</button>
-    <button class="btn block" id="importData">ייבא גיבוי</button><input type="file" id="importFile" accept="application/json" hidden />
-  </div>
-</div>
+    html=html
+      .replace(/<link\b[^>]*href=["'](?:\.\/|\/)?styles\.css(?:\?[^"']*)?["'][^>]*>/i,'<style>'+css.replace(/<\/style/gi,'<\\/style')+'</style>')
+      .replace(/<script\b[^>]*src=["'](?:\.\/|\/)?app\.js(?:\?[^"']*)?["'][^>]*><\/script>/i,'')
+      .replace(/(["'])\/manifest\.webmanifest\1/g,'$1./manifest.webmanifest$1')
+      .replace(/(["'])\/icon\.svg\1/g,'$1./icon.svg$1')
+      .replace(/<head>/i,'<head><base href="./">');
 
-<div class="modal" id="pasteModal">
-  <div class="sheet"><div class="sheet-handle"></div><button class="closex" data-close="pasteModal">✕</button><h3>הדבק טקסט של מודעה</h3>
-    <div class="field"><label>טקסט שהועתק מ-Facebook / יד2</label><textarea id="pasteText" style="min-height:180px" placeholder="הדבק כאן כותרת, מחיר ותיאור..."></textarea></div>
-    <button class="btn primary block" id="parsePaste">חלץ פרטים</button>
-  </div>
-</div>
-
-<script src="app.js" defer></script>
+    document.open();
+    document.write(html);
+    document.close();
+    const script=document.createElement('script');
+    script.textContent=app+'\n//# sourceURL=treasure-radar-app.js';
+    (document.body||document.documentElement).appendChild(script);
+    if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }catch(error){console.error(error);fail(error&&error.message?error.message:'שגיאה לא ידועה');}
+})();
+</script>
 </body>
 </html>
