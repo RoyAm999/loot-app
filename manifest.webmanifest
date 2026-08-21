@@ -1,0 +1,14 @@
+{
+  "name": "TreasureRadar IL",
+  "short_name": "TreasureRadar",
+  "description": "מציאות, אוסף ופליפים",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090b0f",
+  "theme_color": "#0b0e13",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
